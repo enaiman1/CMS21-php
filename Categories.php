@@ -1,3 +1,30 @@
+<?php require_once("./Includes/DB.php"); ?>
+<?php require_once("./Includes/Functions.php"); ?>
+<?php require_once("./Includes/Sessions.php"); ?>
+
+<?php 
+if(isset($_POST["Submit"])){
+  $Category = $_POST["CategoryTitle"];
+  $Admin = "Eric";
+
+  if(empty($Category)){
+    $_SESSION["ErrorMessage"]= "All Fields must be filled out";
+    Redirect_to("Categories.php");
+  } elseif(strlen($Category) < 3){
+    $_SESSION["ErrorMessage"]= "Title must be greater then 2 characters";
+    Redirect_to("Categories.php");
+  }elseif(strlen($Category) > 49){
+    $_SESSION["ErrorMessage"]= "Title must be less then 50 characters";
+    Redirect_to("Categories.php");
+  } else {
+    //query to insert into DB
+  }
+  } 
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,7 +42,7 @@
     <link rel="stylesheet" href="./Css/styles.css">
     <!-- font awesome -->
     <script src="https://kit.fontawesome.com/918054a49e.js" crossorigin="anonymous"></script>
-    <title>Document</title>
+    <title>Categories</title>
   </head>
   <body>
 <!-- Navbar -->
@@ -62,14 +89,51 @@
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-         <h1 class="title">Basic</h1>
+         <h1 class="title"><i class="fas fa-edit"></i>Manage Categories</h1>
       </div>
     </div>
   </div>
 </header> <!--ending header-->
 
-<br>
+<!-- main Area -->
+<section class="container py-2 mb-4">
 
+    <div class="row">
+        <div class="offset-lg-1 col-lg-10" style="min-height:400px;">
+        <?php 
+        echo ErrorMessage();
+        echo SuccessMessage();
+        ?>
+            <form action="Categories.php" method="post">
+                <div class="card bg-secondary text-light mb-3">
+                    <div class="card-header">
+                        <h1>Add New Category</h1>
+                    </div>
+                    <div class="card-body bg-dark">
+                        <div class="form-group">
+                            <label for="title"><span class="FieldInfo">Category Title:</span></label>
+                            <input class="form-control" type="text" name="CategoryTitle", id="title" placeholder="Title" value="">
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-6 mt-2 mb-2">
+                            <a href="Dashboard.php" class="btn btn-warning d-block"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+                          </div>
+                          <div class="col-lg-6 mt-2 mb-2">
+                          
+                            <button type="submit" name="Submit" class="btn btn-success btn-block "><i class="fas fa-check"></i>Publish
+                          </button>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- end main Area -->
 
 <footer class="bg-dark text-white">
   <div class="container">
