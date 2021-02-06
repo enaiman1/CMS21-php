@@ -1,42 +1,57 @@
-<?php require_once("./Includes/DB.php"); ?>
-<?php require_once("./Includes/Functions.php"); ?>
-<?php require_once("./Includes/Sessions.php"); ?>
+<?php 
+require_once("./Includes/DB.php"); 
+require_once("./Includes/Functions.php");  
+require_once("./Includes/Sessions.php"); 
+?>
 
 <?php 
 if(isset($_POST["Submit"])){
-  $Category = $_POST["CategoryTitle"];
+  print "<pre>";
+print_r($_POST);
+print_r($_FILES);
+print "</pre>";
+
+  $PostTitle = $_POST["PostTitle"];
+  $Category = $_POST["Category"];
+  $Image = $_FILES["Image"]["name"];
+  $Target = "Upload/".basename($_FILES["Image"]["name"]); //puts submitted image into upload folder
+  $PostDescription = $_POST["PostDescription"];
   $Admin = "Eric";
   
-date_default_timezone_set('America/New_York');
-$CurrentTime=time();
-$DateTime=strftime("%B-%d-%Y %H:%M:%S" , $CurrentTime);
+  date_default_timezone_set('America/New_York');
+  $CurrentTime=time();
+  $DateTime=strftime("%B-%d-%Y %H:%M:%S" , $CurrentTime);
 
 
-  if(empty($Category)){
-    $_SESSION["ErrorMessage"]= "All Fields must be filled out";
-    Redirect_to("Categories.php");
-  } elseif(strlen($Category) < 3){
-    $_SESSION["ErrorMessage"]= "Title must be greater then 2 characters";
-    Redirect_to("Categories.php");
-  }elseif(strlen($Category) > 49){
-    $_SESSION["ErrorMessage"]= "Title must be less then 50 characters";
-    Redirect_to("Categories.php");
+  if(empty($PostTitle)){
+    $_SESSION["ErrorMessage"]= "Title can't be empty";
+    Redirect_to("AddNewPost.php");
+  } elseif(strlen($PostTitle) < 5){
+    $_SESSION["ErrorMessage"]= "Title must be greater then 5 characters";
+    Redirect_to("AddNewPost.php");
+  }elseif(strlen($PostTest) > 999){
+    $_SESSION["ErrorMessage"]= "Post Description should be less then 1000 characters";
+    Redirect_to("AddNewPost.php");
   } else {
     //query to insert into DB
-    $sql = "INSERT INTO category(title, author, datetime)";
-    $sql .= "VALUES(:categoryName, :adminName, :dateTime)";
+    $sql = "INSERT INTO posts(datetime,title, category, author, image, post )";
+    $sql .= "VALUES(:dateTime, :postTitle, :categoryName, :adminName, :imageName, :postDescription )";
     $stmt = $ConnectingDB->prepare($sql);
+    $stmt->bindValue(':dateTime', $DateTime);
+    $stmt->bindValue(':postTitle', $PostTitle);
     $stmt->bindValue(':categoryName', $Category);
     $stmt->bindValue(':adminName', $Admin);
-    $stmt->bindValue(':dateTime', $DateTime);
+    $stmt->bindValue(':imageName', $Image);
+    $stmt->bindValue(':postDescription', $PostDescription);
     $Execute=$stmt->execute();
+    move_uploaded_file($_FILES["Image"]["tmp_name"], $Target);
 
     if($Execute){
-      $_SESSION["SuccessMessage"] = "Category with id : ". $ConnectingDB->lastInsertId()  ." Added Successfully";
-      Redirect_to("Categories.php");
+      $_SESSION["SuccessMessage"] = "Post with id : ". $ConnectingDB->lastInsertId()  ." Added Successfully";
+      Redirect_to("AddNewPost.php");
     } else {
       $_SESSION["ErrorMessage"]= "Something went wrong. Try Again!";
-    Redirect_to("Categories.php");
+    Redirect_to("AddNewPost.php");
     }
   }
   } 
@@ -109,7 +124,7 @@ $DateTime=strftime("%B-%d-%Y %H:%M:%S" , $CurrentTime);
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-         <h1 class="title"><i class="fas fa-edit"></i>Manage Categories</h1>
+         <h1 class="title"><i class="fas fa-edit"></i>Add New Post</h1>
       </div>
     </div>
   </div>
@@ -124,15 +139,42 @@ $DateTime=strftime("%B-%d-%Y %H:%M:%S" , $CurrentTime);
         echo ErrorMessage();
         echo SuccessMessage();
         ?>
-            <form action="Categories.php" method="post">
+            <form action="AddNewPost.php" method="post" enctype="multipart/form-data">
                 <div class="card bg-secondary text-light mb-3">
-                    <div class="card-header">
-                        <h1>Add New Category</h1>
-                    </div>
                     <div class="card-body bg-dark">
-                        <div class="form-group">
-                            <label for="title"><span class="FieldInfo">Category Title:</span></label>
-                            <input class="form-control" type="text" name="CategoryTitle", id="title" placeholder="Title" value="">
+                        <div class="form-group mb-2">
+                            <label for="title"><span class="FieldInfo">Post Title:</span></label>
+                            <input class="form-control" type="text" name="PostTitle", id="title" placeholder="Title" value="">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="CategoryTitle"><span class="FieldInfo">Chose Category</span></label>
+                            <select name="Category" class="form-control" id="CategoryTitle">
+                                <?php 
+                                  //Fetching all categories from the category table
+                                  $ConnectingDB;
+                                  $sql = "SELECT id,title FROM category";
+                                  $stmt = $ConnectingDB->query($sql);
+                                  while($DateRows = $stmt->fetch()){
+                                    $Id = $DateRows['id'];
+                                    $CategoryName = $DateRows['title'];
+                                  
+                                ?>
+                                <option><?php echo $CategoryName;?></option>
+                              
+                                <?php 
+                                } 
+                                ?>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="imageSelect"><span class="FieldInfo">Select Image</span></label>
+                        <div class="input-group">
+                            <input type="file" name="Image" class="form-control" id="imageselect" aria-describedby="inputGroupFileAddon04" aria-label="Upload" >
+                        </div>
+                        </div>
+                        <div class="form-group mb-2">
+                          <label for="Post"><span class="FieldInfo">Post</span></label>
+                          <textarea name="PostDescription" id="Post" class="form-control" cols="80" rows="10"></textarea>
                         </div>
                         <div class="row">
                           <div class="col-lg-6 mt-2 mb-2">

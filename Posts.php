@@ -1,48 +1,6 @@
 <?php require_once("./Includes/DB.php"); ?>
-<?php require_once("./Includes/Functions.php"); ?>
+<?php require_once("./Includes/Functions.php"); ?> 
 <?php require_once("./Includes/Sessions.php"); ?>
-
-<?php 
-if(isset($_POST["Submit"])){
-  $Category = $_POST["CategoryTitle"];
-  $Admin = "Eric";
-  
-date_default_timezone_set('America/New_York');
-$CurrentTime=time();
-$DateTime=strftime("%B-%d-%Y %H:%M:%S" , $CurrentTime);
-
-
-  if(empty($Category)){
-    $_SESSION["ErrorMessage"]= "All Fields must be filled out";
-    Redirect_to("Categories.php");
-  } elseif(strlen($Category) < 3){
-    $_SESSION["ErrorMessage"]= "Title must be greater then 2 characters";
-    Redirect_to("Categories.php");
-  }elseif(strlen($Category) > 49){
-    $_SESSION["ErrorMessage"]= "Title must be less then 50 characters";
-    Redirect_to("Categories.php");
-  } else {
-    //query to insert into DB
-    $sql = "INSERT INTO category(title, author, datetime)";
-    $sql .= "VALUES(:categoryName, :adminName, :dateTime)";
-    $stmt = $ConnectingDB->prepare($sql);
-    $stmt->bindValue(':categoryName', $Category);
-    $stmt->bindValue(':adminName', $Admin);
-    $stmt->bindValue(':dateTime', $DateTime);
-    $Execute=$stmt->execute();
-
-    if($Execute){
-      $_SESSION["SuccessMessage"] = "Category with id : ". $ConnectingDB->lastInsertId()  ." Added Successfully";
-      Redirect_to("Categories.php");
-    } else {
-      $_SESSION["ErrorMessage"]= "Something went wrong. Try Again!";
-    Redirect_to("Categories.php");
-    }
-  }
-  } 
-
-
-?>
 
 
 <!DOCTYPE html>
@@ -62,7 +20,7 @@ $DateTime=strftime("%B-%d-%Y %H:%M:%S" , $CurrentTime);
     <link rel="stylesheet" href="./Css/styles.css">
     <!-- font awesome -->
     <script src="https://kit.fontawesome.com/918054a49e.js" crossorigin="anonymous"></script>
-    <title>Categories</title>
+    <title>Posts</title>
   </head>
   <body>
 <!-- Navbar -->
@@ -103,58 +61,117 @@ $DateTime=strftime("%B-%d-%Y %H:%M:%S" , $CurrentTime);
     </div> <!--ending toggle button-->
     </div>
 </nav> 
-<div style="height:10px; background: #27aee1"></div> <!--end navbar-->
+<div style="height:10px; background: #27aee1;"></div> <!--end navbar-->
 
 <header class="bg-dark text-white py-3">
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-         <h1 class="title"><i class="fas fa-edit"></i>Manage Categories</h1>
+         <h1 class="title"><i class="fas fa-blog" style="color:#27aae1;"></i> Blog Posts</h1>
+      </div>
+      <div class="col-lg-3 mb-2">
+          <a href="AddNewPost.php" class="btn btn-primary d-block">
+            <i class="fas fa-edit">Add New Post</i>
+          </a>
+      </div>
+      <div class="col-lg-3 mb-2">
+          <a href="Categories.php" class="btn btn-info d-block">
+            <i class="fas fa-folder-plus">Add New Category</i>
+          </a>
+      </div>
+      <div class="col-lg-3 mb-2">
+          <a href="Admins.php" class="btn btn-warning d-block">
+            <i class="fas fa-user-plus">Add New Admin</i>
+          </a>
+      </div>
+      <div class="col-lg-3 mb-2">
+          <a href="Comments.php" class="btn btn-success d-block">
+            <i class="fas fa-check">Approved Comments</i>
+          </a>
       </div>
     </div>
   </div>
 </header> <!--ending header-->
 
-<!-- main Area -->
+<!-- Main Area -->
 <section class="container py-2 mb-4">
+  <div class="row">
+      <div class="col-lg-12">
+        <table class="table table-striped table-hover">
+        <thead class="table-dark">
+           <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Date&Time</th>
+              <th>Author</th>
+              <th>Banner</th>
+              <th>Comments</th>
+              <th>Action</th>
+              <th>Live Preview</th>
+            </tr>
+        </thead>
+         
+            <?php 
+              $ConnectingDB;
+              $sql = "SELECT * FROM posts";
+              $stmt = $ConnectingDB->query($sql);
+              $Sr = 0;
+              while($DataRows = $stmt->fetch()){
+                $Id = $DataRows["id"];
+                $DateTime = $DataRows["datetime"];
+                $PostTitle = $DataRows["title"];
+                $Category = $DataRows["category"];
+                $Admin = $DataRows["author"];
+                $Image = $DataRows["image"];
+                $Post =$DataRows["post"];
+                $Sr++;
+              ?>
+              <tbody>
+              <tr>
+                <td><?php echo $Sr; ?></td>
+                <td>
+                <?php 
+                if(strlen($PostTitle) > 20) {
+                  $PostTitle= substr($PostTitle,0,18)."..";
+                } echo $PostTitle; 
+                ?>
+                </td>
+                <td><?php if(strlen($Category) > 8) {
+                  $Category= substr($Category,0,8)."..";
+                } echo $Category; 
+                ?></td>
+                <td><?php if(strlen($DateTime) > 11) {
+                  $DateTime= substr($DateTime,0,11)."..";
+                } echo $DateTime; 
+                ?></td>
+                <td><?php if(strlen($Admin) > 6) {
+                  $Admin= substr($Admin,0,6)."..";
+                } echo $Admin; 
+                ?></td>
+                <td><img src="Upload/<?php echo $Image; ?>" width="170px;" height="50px"></td>
+                <td>Comments</td>
+                <td>
+                <a href="#"><span class="btn btn-warning">Edit</span></a>
+                <a href="#"><span class="btn btn-danger">Delete</span></a>
+                </td>
+                <td>
+                <a href="#"><span class="btn btn-primary">Live Preview</span></a>
+                </td>
+              </tr>
+              </tbody>
+            <?php 
+             }
+            ?>
+        
+        </table>
+      </div>
+  </div>
 
-    <div class="row">
-        <div class="offset-lg-1 col-lg-10" style="min-height:400px;">
-        <?php 
-        echo ErrorMessage();
-        echo SuccessMessage();
-        ?>
-            <form action="Categories.php" method="post">
-                <div class="card bg-secondary text-light mb-3">
-                    <div class="card-header">
-                        <h1>Add New Category</h1>
-                    </div>
-                    <div class="card-body bg-dark">
-                        <div class="form-group">
-                            <label for="title"><span class="FieldInfo">Category Title:</span></label>
-                            <input class="form-control" type="text" name="CategoryTitle", id="title" placeholder="Title" value="">
-                        </div>
-                        <div class="row">
-                          <div class="col-lg-6 mt-2 mb-2">
-                            <a href="Dashboard.php" class="btn btn-warning d-block"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-                          </div>
-                          <div class="col-lg-6 mt-2 mb-2">
-                          
-                            <button type="submit" name="Submit" class="btn btn-success btn-block "><i class="fas fa-check"></i>Publish
-                          </button>
-                          </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
 
 </section>
 
-
-<!-- end main Area -->
-
+<!-- end mai Area -->
 <footer class="bg-dark text-white">
   <div class="container">
     <div class="row">
