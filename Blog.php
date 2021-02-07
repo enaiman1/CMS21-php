@@ -51,8 +51,8 @@
         <ul class="navbar-nav mx-auto">
             <form class="form-inline d-none d-sm-block" action="Blog.php">
               <div class="from-group">
-                <input class="form-control mr-2" type="text" name="search" placeholder="Search here">
-                <button type="button" class="btn btn-primary" name="Searchbutton">Go</button>
+                <input class="form-control mr-2" type="text" name="Search" placeholder="Search here">
+                <button  class="btn btn-primary" name="Searchbutton">Go</button>
               </div>
             </form>
         </ul>
@@ -71,9 +71,25 @@
             <h1 class="lead">The Complete Blog by using PHP by Eric</h1>
 
             <?php 
-              $ConnectingDB;
-              $sql = "SELECT * FROM posts ORDER BY id desc";
-              $stmt= $ConnectingDB->query($sql);
+               $ConnectingDB;
+               if(isset($_GET["Searchbutton"])){
+                 $Search = $_GET["Search"];
+                 $sql = "SELECT * FROM posts 
+                 WHERE datetime LIKE :search OR 
+                 title LIKE :search OR 
+                 category LIKE :search OR
+                 post LIKE :search ";
+                 $stmt = $ConnectingDB->prepare($sql);
+                 $stmt->bindValue(':search','%'.$Search.'%');
+                 $stmt->execute();
+              }else {
+
+                $sql = "SELECT * FROM posts ORDER BY id desc";
+                $stmt= $ConnectingDB->query($sql);
+
+              }
+              
+              
               while ($DataRows = $stmt->fetch()){
                 $PostId = $DataRows['id'];
                 $DateTime = $DataRows['datetime'];
