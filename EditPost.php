@@ -8,7 +8,9 @@ require_once( './Includes/Sessions.php' );
 ?>
 
 <?php
-if ( isset( $_POST['Submit'] ) ) {
+$SearchQueryParameter = $_GET['id'];
+
+if ( isset( $_POST['Submit'])) {
     print '<pre>';
     print_r( $_POST );
     print_r( $_FILES );
@@ -28,33 +30,36 @@ if ( isset( $_POST['Submit'] ) ) {
 
     if ( empty( $PostTitle ) ) {
         $_SESSION['ErrorMessage'] = "Title can't be empty";
-        Redirect_to( 'AddNewPost.php' );
+        Redirect_to( 'Posts.php' );
     } elseif ( strlen( $PostTitle ) < 5 ) {
         $_SESSION['ErrorMessage'] = 'Title must be greater then 5 characters';
-        Redirect_to( 'AddNewPost.php' );
-    } elseif ( strlen( $PostTest ) > 999 ) {
-        $_SESSION['ErrorMessage'] = 'Post Description should be less then 1000 characters';
-        Redirect_to( 'AddNewPost.php' );
+        Redirect_to( 'Posts.php' );
+    } elseif ( strlen( $PostDescription ) > 9999 ) {
+        $_SESSION['ErrorMessage'] = 'Post Description should be less then 10000 characters';
+        Redirect_to( 'Posts.php' );
     } else {
-        //query to insert into DB
-        $sql = 'INSERT INTO posts(datetime,title, category, author, image, post )';
-        $sql .= 'VALUES(:dateTime, :postTitle, :categoryName, :adminName, :imageName, :postDescription )';
-        $stmt = $ConnectingDB->prepare( $sql );
-        $stmt->bindValue( ':dateTime', $DateTime );
-        $stmt->bindValue( ':postTitle', $PostTitle );
-        $stmt->bindValue( ':categoryName', $Category );
-        $stmt->bindValue( ':adminName', $Admin );
-        $stmt->bindValue( ':imageName', $Image );
-        $stmt->bindValue( ':postDescription', $PostDescription );
-        $Execute = $stmt->execute();
+        //query to Update the post in DB
+        $ConnectingDB;
+        //if image field is not empty update the post else dont change the image
+        if(!empty($_FILES["Image"]['name'])){
+            $sql = "UPDATE posts 
+            SET title='$PostTitle', category='$Category', image='$Image', post='$PostDescription' 
+            WHERE id='$SearchQueryParameter'";
+        } else {
+            $sql = "UPDATE posts 
+            SET title='$PostTitle', category='$Category', post='$PostDescription' 
+            WHERE id='$SearchQueryParameter'";
+        }
+       
+        $Execute = $ConnectingDB->query($sql);
         move_uploaded_file( $_FILES['Image']['tmp_name'], $Target );
 
         if ( $Execute ) {
-            $_SESSION['SuccessMessage'] = 'Post with id : '. $ConnectingDB->lastInsertId()  .' Added Successfully';
-            Redirect_to( 'AddNewPost.php' );
+            $_SESSION['SuccessMessage'] = 'Post Added Successfully';
+            Redirect_to( 'Posts.php' );
         } else {
             $_SESSION['ErrorMessage'] = 'Something went wrong. Try Again!';
-            Redirect_to( 'AddNewPost.php' );
+            Redirect_to( 'Posts.php' );
         }
     }
 }
@@ -141,7 +146,6 @@ echo ErrorMessage();
 echo SuccessMessage();
 // fetching existing content according to id
 $ConnectingDB;
-$SearchQueryParameter = $_GET["id"];
 $sql ="SELECT * FROM posts WHERE id='$SearchQueryParameter' ";
 $stmt = $ConnectingDB -> query($sql);
 while ($DataRows = $stmt->fetch() ){
@@ -152,7 +156,7 @@ while ($DataRows = $stmt->fetch() ){
 }
 
 ?>
-<form action = 'AddNewPost.php' method = 'post' enctype = 'multipart/form-data'>
+<form action = 'EditPost.php?id=<?php echo $SearchQueryParameter; ?>' method = 'post' enctype = 'multipart/form-data'>
 <div class = 'card bg-secondary text-light mb-3'>
 <div class = 'card-body bg-dark'>
 <div class = 'form-group mb-2'>

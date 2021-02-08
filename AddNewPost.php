@@ -29,8 +29,8 @@ print "</pre>";
   } elseif(strlen($PostTitle) < 5){
     $_SESSION["ErrorMessage"]= "Title must be greater then 5 characters";
     Redirect_to("AddNewPost.php");
-  }elseif(strlen($PostTest) > 999){
-    $_SESSION["ErrorMessage"]= "Post Description should be less then 1000 characters";
+  }elseif(strlen($PostDescription) > 9999){
+    $_SESSION["ErrorMessage"]= "Post Description should be less then 10000 characters";
     Redirect_to("AddNewPost.php");
   } else {
     //query to insert into DB
