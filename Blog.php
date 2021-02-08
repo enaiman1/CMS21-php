@@ -69,7 +69,10 @@
         <div class="col-sm-8">
             <h1>The Complete Responsive CMS Blog</h1>
             <h1 class="lead">The Complete Blog by using PHP by Eric</h1>
-
+            <?php 
+               echo ErrorMessage();
+               echo SuccessMessage();
+            ?>
             <?php 
                $ConnectingDB;
                if(isset($_GET["Searchbutton"])){
@@ -116,7 +119,7 @@
                     echo htmlentities($PostDecription); 
                   ?>
                 </p>
-                <a href="FullPost.php" style="float:right;">
+                <a href="FullPost.php?id=<?php echo $PostId; ?>" style="float:right;">
                   <span class="btn btn-info">Read More >> </span>
                 </a>
               </div>
