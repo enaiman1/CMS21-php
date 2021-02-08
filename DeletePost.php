@@ -9,60 +9,34 @@ require_once( './Includes/Sessions.php' );
 
 <?php
 $SearchQueryParameter = $_GET['id'];
+// fetching existing content according to id
+$ConnectingDB;
+$sql = "SELECT * FROM posts WHERE id='$SearchQueryParameter' ";
+$stmt = $ConnectingDB -> query( $sql );
+while ( $DataRows = $stmt->fetch() ) {
+    $TitleToBeDeleted = $DataRows['title'];
+    $CategoryToBeDeleted = $DataRows['category'];
+    $ImageToBeDeleted = $DataRows['image'];
+    $PostToBeDeleted = $DataRows['post'];
+}
 
-if ( isset( $_POST['Submit'])) {
-    print '<pre>';
-    print_r( $_POST );
-    print_r( $_FILES );
-    print '</pre>';
-
-    $PostTitle = $_POST['PostTitle'];
-    $Category = $_POST['Category'];
-    $Image = $_FILES['Image']['name'];
-    $Target = 'Upload/'.basename( $_FILES['Image']['name'] );
-    //puts submitted image into upload folder
-    $PostDescription = $_POST['PostDescription'];
-    $Admin = 'Eric';
-
-    date_default_timezone_set( 'America/New_York' );
-    $CurrentTime = time();
-    $DateTime = strftime( '%B-%d-%Y %H:%M:%S', $CurrentTime );
-
-    if ( empty( $PostTitle ) ) {
-        $_SESSION['ErrorMessage'] = "Title can't be empty";
-        Redirect_to( 'Posts.php' );
-    } elseif ( strlen( $PostTitle ) < 5 ) {
-        $_SESSION['ErrorMessage'] = 'Title must be greater then 5 characters';
-        Redirect_to( 'Posts.php' );
-    } elseif ( strlen( $PostDescription ) > 9999 ) {
-        $_SESSION['ErrorMessage'] = 'Post Description should be less then 10000 characters';
-        Redirect_to( 'Posts.php' );
-    } else {
-        //query to Update the post in DB
+if ( isset( $_POST['Submit'] ) ) {
+    //query to delete post from DB
         $ConnectingDB;
-        //if image field is not empty update the post else dont change the image
-        if(!empty($_FILES["Image"]['name'])){
-            $sql = "UPDATE posts 
-            SET title='$PostTitle', category='$Category', image='$Image', post='$PostDescription' 
-            WHERE id='$SearchQueryParameter'";
-        } else {
-            $sql = "UPDATE posts 
-            SET title='$PostTitle', category='$Category', post='$PostDescription' 
-            WHERE id='$SearchQueryParameter'";
-        }
-       
-        $Execute = $ConnectingDB->query($sql);
-        move_uploaded_file( $_FILES['Image']['tmp_name'], $Target );
+        $sql = "DELETE FROM posts WHERE id='$SearchQueryParameter'";
 
+        $Execute = $ConnectingDB->query( $sql );
         if ( $Execute ) {
-            $_SESSION['SuccessMessage'] = 'Post Added Successfully';
+            $Target_Path_TO_Delete_Image = "Upload/$ImageToBeDeleted";
+            unlink($Target_Path_TO_Delete_Image);
+            $_SESSION['SuccessMessage'] = 'Post DELETED Successfully';
             Redirect_to( 'Posts.php' );
         } else {
             $_SESSION['ErrorMessage'] = 'Something went wrong. Try Again!';
             Redirect_to( 'Posts.php' );
         }
     }
-}
+
 
 ?>
 
@@ -83,7 +57,7 @@ crossorigin = 'anonymous'
 <link rel = 'stylesheet' href = './Css/styles.css'>
 <!-- font awesome -->
 <script src = 'https://kit.fontawesome.com/918054a49e.js' crossorigin = 'anonymous'></script>
-<title>Edit Post</title>
+<title>Delete Post</title>
 </head>
 <body>
 <!-- Navbar -->
@@ -130,7 +104,7 @@ crossorigin = 'anonymous'
 <div class = 'container'>
 <div class = 'row'>
 <div class = 'col-md-12'>
-<h1 class = 'title'><i class = 'fas fa-edit'></i>Edit Post</h1>
+<h1 class = 'title'><i class = 'fas fa-edit'></i>Delete Post</h1>
 </div>
 </div>
 </div>
@@ -144,64 +118,31 @@ crossorigin = 'anonymous'
 <?php
 echo ErrorMessage();
 echo SuccessMessage();
-// fetching existing content according to id
-$ConnectingDB;
-$sql ="SELECT * FROM posts WHERE id='$SearchQueryParameter' ";
-$stmt = $ConnectingDB -> query($sql);
-while ($DataRows = $stmt->fetch() ){
-    $TitleToBeUpdated = $DataRows['title'];
-    $CategoryToBeUpdated = $DataRows['category'];
-    $ImageToBeUpdated = $DataRows['image'];
-    $PostToBeUpdated = $DataRows['post'];
-}
+
 
 ?>
-<form action = 'EditPost.php?id=<?php echo $SearchQueryParameter; ?>' method = 'post' enctype = 'multipart/form-data'>
+<form action = 'DeletePost.php?id=<?php echo $SearchQueryParameter; ?>' method = 'post' enctype = 'multipart/form-data'>
 <div class = 'card bg-secondary text-light mb-3'>
 <div class = 'card-body bg-dark'>
 <div class = 'form-group mb-2'>
 <label for = 'title'><span class = 'FieldInfo'>Post Title:</span></label>
-<input class = 'form-control' type = 'text' name = 'PostTitle', id = 'title' placeholder = 'Title' value = "<?php echo $TitleToBeUpdated; ?>">
+<input disabled class = 'form-control' type = 'text' name = 'PostTitle', id = 'title' placeholder = 'Title' value = "<?php echo $TitleToBeDeleted; ?>">
 </div>
-<div class = 'form-group mb-2'>
-<span class="FieldInfo">Existing Category: </span>
-<?php echo $CategoryToBeUpdated ?>
+<div class = 'form-group '>
+<span class = 'FieldInfo'>Existing Category: </span>
+<?php echo $CategoryToBeDeleted ?>
 <br>
-<label for = 'CategoryTitle'><span class = 'FieldInfo'>Chose Category</span></label>
-<select name = 'Category' class = 'form-control' id = 'CategoryTitle'>
-<?php
-//Fetching all categories from the category table
-$ConnectingDB;
-$sql = 'SELECT id,title FROM category';
-$stmt = $ConnectingDB->query( $sql );
-while( $DateRows = $stmt->fetch() ) {
-    $Id = $DateRows['id'];
-    $CategoryName = $DateRows['title'];
-
-    ?>
-    <option><?php echo $CategoryName;
-    ?></option>
-
-    <?php
-}
-
-?>
-</select>
 </div>
-<div class = 'form-group mb-2'>
-<span class="FieldInfo">Existing Image:</span>
-<img src="Upload/<?php echo $ImageToBeUpdated ?>" width="170px;" height="70px;" alt="">
-<br>
+<div class = 'form-group '>
+<span class = 'FieldInfo'>Existing Image:</span>
+<img src = "Upload/<?php echo $ImageToBeDeleted ?>" width = '170px;' height = '70px;' alt = ''>
 
-<label for = 'imageSelect'><span class = 'FieldInfo'>Select Image</span></label>
-<div class = 'input-group'>
-<input type = 'file' name = 'Image' class = 'form-control' id = 'imageselect' aria-describedby = 'inputGroupFileAddon04' aria-label = 'Upload' >
-</div>
 </div>
 <div class = 'form-group mb-2'>
 <label for = 'Post'><span class = 'FieldInfo'>Post</span></label>
-<textarea name = 'PostDescription' id = 'Post' class = 'form-control' cols = '80' rows = '10'>
-    <?php echo $PostToBeUpdated; ?>
+<textarea disabled name = 'PostDescription' id = 'Post' class = 'form-control' cols = '80' rows = '10'>
+<?php echo $PostToBeDeleted;
+?>
 </textarea>
 </div>
 <div class = 'row'>
@@ -210,7 +151,7 @@ while( $DateRows = $stmt->fetch() ) {
 </div>
 <div class = 'col-lg-6 mt-2 mb-2'>
 
-<button type = 'submit' name = 'Submit' class = 'btn btn-success btn-block '><i class = 'fas fa-check'></i>Publish
+<button type = 'submit' name = 'Submit' class = 'btn btn-danger btn-block '><i class = 'fas fa-trash'></i>Delete
 </button>
 </div>
 </div>
