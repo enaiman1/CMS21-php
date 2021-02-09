@@ -7,38 +7,44 @@
 
 <?php
 if ( isset( $_POST['Submit'] ) ) {
-    $Category = $_POST['CategoryTitle'];
+    $UserName = $_POST['Username'];
+    $Name = $_POST['Name'];
+    $Password = $_POST['Password'];
+    $ConfirmPassword = $_POST['ConfirmPassword'];
     $Admin = 'Eric';
 
     date_default_timezone_set( 'America/New_York' );
     $CurrentTime = time();
     $DateTime = strftime( '%B-%d-%Y %H:%M:%S', $CurrentTime );
 
-    if ( empty( $Category ) ) {
+    if ( empty( $UserName ) || empty( $Password ) || empty( $ConfirmPassword )) {
         $_SESSION['ErrorMessage'] = 'All Fields must be filled out';
-        Redirect_to( 'Categories.php' );
-    } elseif ( strlen( $Category ) < 3 ) {
-        $_SESSION['ErrorMessage'] = 'Title must be greater then 2 characters';
-        Redirect_to( 'Categories.php' );
-    } elseif ( strlen( $Category ) > 49 ) {
-        $_SESSION['ErrorMessage'] = 'Title must be less then 50 characters';
-        Redirect_to( 'Categories.php' );
+        Redirect_to( 'Admins.php' );
+    } elseif ( strlen( $Password ) < 4 ) {
+        $_SESSION['ErrorMessage'] = 'Password should be greater then 3 character';
+        Redirect_to( 'Admins.php' );
+    } elseif ($Password !== $ConfirmPassword) {
+        $_SESSION['ErrorMessage'] = 'Password and confirm password should match';
+        Redirect_to( 'Admins.php' );
     } else {
-        //query to insert into DB
-        $sql = 'INSERT INTO category(title, author, datetime)';
-        $sql .= 'VALUES(:categoryName, :adminName, :dateTime)';
+        //query to insert new admin into DB
+        $sql = 'INSERT INTO admins(datetime, username, password, aname, addedby)';
+        $sql .= 'VALUES(:dateTime, :userName, :password, :aName, :adminName)';
         $stmt = $ConnectingDB->prepare( $sql );
-        $stmt->bindValue( ':categoryName', $Category );
-        $stmt->bindValue( ':adminName', $Admin );
         $stmt->bindValue( ':dateTime', $DateTime );
+        $stmt->bindValue( ':userName', $UserName );
+        $stmt->bindValue( ':password', $Password );
+        $stmt->bindValue( ':aName', $Name );
+        $stmt->bindValue( ':adminName', $Admin );
+        
         $Execute = $stmt->execute();
 
         if ( $Execute ) {
-            $_SESSION['SuccessMessage'] = 'Category with id : '. $ConnectingDB->lastInsertId()  .' Added Successfully';
-            Redirect_to( 'Categories.php' );
+            $_SESSION['SuccessMessage'] = 'New Admin with the name of ' . $Name . ' added Successfully';
+            Redirect_to( 'Admins.php' );
         } else {
             $_SESSION['ErrorMessage'] = 'Something went wrong. Try Again!';
-            Redirect_to( 'Categories.php' );
+            Redirect_to( 'Admins.php' );
         }
     }
 }
@@ -62,7 +68,7 @@ crossorigin = 'anonymous'
 <link rel = 'stylesheet' href = './Css/styles.css'>
 <!-- font awesome -->
 <script src = 'https://kit.fontawesome.com/918054a49e.js' crossorigin = 'anonymous'></script>
-<title>Categories</title>
+<title>Admin Page</title>
 </head>
 <body>
 <!-- Navbar -->
@@ -109,7 +115,7 @@ crossorigin = 'anonymous'
 <div class = 'container'>
 <div class = 'row'>
 <div class = 'col-md-12'>
-<h1 class = 'title'><i class = 'fas fa-edit'></i>Manage Categories</h1>
+<h1 class = 'title'><i class = 'fas fa-user'></i>Manage Admin</h1>
 </div>
 </div>
 </div>
@@ -124,15 +130,28 @@ crossorigin = 'anonymous'
 echo ErrorMessage();
 echo SuccessMessage();
 ?>
-<form action = 'Categories.php' method = 'post'>
+<form action = 'Admins.php' method = 'post'>
 <div class = 'card bg-secondary text-light mb-3'>
 <div class = 'card-header'>
-<h1>Add New Category</h1>
+<h1>Add New Admin</h1>
 </div>
 <div class = 'card-body bg-dark'>
 <div class = 'form-group'>
-<label for = 'title'><span class = 'FieldInfo'>Category Title:</span></label>
-<input class = 'form-control' type = 'text' name = 'CategoryTitle', id = 'title' placeholder = 'Title' value = ''>
+<label for = 'username'><span class = 'FieldInfo'>UserName:</span></label>
+<input class = 'form-control' type = 'text' name = 'Username' id = 'username' placeholder = 'Title' value = ''>
+</div>
+<div class = 'form-group'>
+<label for = 'Name'><span class = 'FieldInfo'>Name:</span></label>
+<input class = 'form-control' type = 'text' name = 'Name' id = 'Name' value = ''>
+<small class="text-muted">Optional</small>
+</div>
+<div class = 'form-group'>
+<label for = 'Password'><span class = 'FieldInfo'>Password:</span></label>
+<input class = 'form-control' type = 'password' name = 'Password' id = 'password' value = ''>
+</div>
+<div class = 'form-group'>
+<label for = 'ConfirmPassword'><span class = 'FieldInfo'>Confirm Password:</span></label>
+<input class = 'form-control' type = 'password' name = 'ConfirmPassword' id = 'confirmPassword' value = ''>
 </div>
 <div class = 'row'>
 <div class = 'col-lg-6 mt-2 mb-2'>
