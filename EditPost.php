@@ -1,20 +1,21 @@
 <?php
+
 require_once( './Includes/DB.php' );
-
 require_once( './Includes/Functions.php' );
-
 require_once( './Includes/Sessions.php' );
 
+
+Confirm_Login();
 ?>
 
 <?php
 $SearchQueryParameter = $_GET['id'];
 
 if ( isset( $_POST['Submit'])) {
-    print '<pre>';
-    print_r( $_POST );
-    print_r( $_FILES );
-    print '</pre>';
+    // print '<pre>';
+    // print_r( $_POST );
+    // print_r( $_FILES );
+    // print '</pre>';
 
     $PostTitle = $_POST['PostTitle'];
     $Category = $_POST['Category'];

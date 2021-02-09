@@ -1,8 +1,10 @@
-<?php require_once( './Includes/DB.php' );
-?>
-<?php require_once( './Includes/Functions.php' );
-?>
-<?php require_once( './Includes/Sessions.php' );
+<?php 
+ require_once( './Includes/DB.php' );
+ require_once( './Includes/Functions.php' );
+ require_once( './Includes/Sessions.php' ); 
+ 
+ $_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+ Confirm_Login();
 ?>
 
 <?php
@@ -11,7 +13,7 @@ if ( isset( $_POST['Submit'] ) ) {
     $Name = $_POST['Name'];
     $Password = $_POST['Password'];
     $ConfirmPassword = $_POST['ConfirmPassword'];
-    $Admin = 'Eric';
+    $Admin = $_SESSION["UserName"];
 
     date_default_timezone_set( 'America/New_York' );
     $CurrentTime = time();

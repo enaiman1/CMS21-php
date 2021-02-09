@@ -1,10 +1,11 @@
 <?php
+
 require_once( './Includes/DB.php' );
-
 require_once( './Includes/Functions.php' );
-
 require_once( './Includes/Sessions.php' );
 
+
+Confirm_Login();
 ?>
 
 <?php

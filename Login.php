@@ -4,6 +4,11 @@
  require_once( './Includes/Sessions.php' ); 
 ?>
 <?php 
+
+if(isset($_SESSION["UserId"])){
+  Redirect_to("Dashboard.php");
+}
+
 if(isset($_POST['Submit'])){
     $UserName = $_POST["Username"];
     $Password = $_POST["Password"];
@@ -11,20 +16,24 @@ if(isset($_POST['Submit'])){
         $_SESSION["ErrorMessage"]= "All fields must be filled out";
         Redirect_to("Login.php");
     }else {
-        $Found_Account=Login_Attempt($UserName, $Password);
-        if($Found_Account){
-            $_SESSION["UserId"]=$Found_Account["id"];
-            $_SESSION["Username"] = $Found_Account["username"];
-            $_SESSION["AdminName"] = $Found_Account["aname"];
-
-            $_SESSION["SuccessMessage"]= "Welcome ". $_SESSION["AdminName"];
-            Redirect_to("Login.php");
-        } else{
-            $_SESSION["ErrorMessage"]= "Incorrect Username/PAssword";
-            Redirect_to("Login.php");
-        }
+      // code for checking username and password from Database
+      $Found_Account=Login_Attempt($UserName,$Password);
+      if ($Found_Account) {
+        $_SESSION["UserId"]=$Found_Account["id"];
+        $_SESSION["UserName"]=$Found_Account["username"];
+        $_SESSION["AdminName"]=$Found_Account["aname"];
+        $_SESSION["SuccessMessage"]= "Wellcome ".$_SESSION["AdminName"]."!";
+        if (isset($_SESSION["TrackingURL"])) {
+          Redirect_to($_SESSION["TrackingURL"]);
+        }else{
+        Redirect_to("Dashboard.php");
+      }
+      }else {
+        $_SESSION["ErrorMessage"]="Incorrect Username/Password";
+        Redirect_to("Login.php");
+      }
     }
-}
+  }
 
 ?>
 

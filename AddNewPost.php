@@ -1,22 +1,25 @@
 <?php 
 require_once("./Includes/DB.php"); 
 require_once("./Includes/Functions.php");  
-require_once("./Includes/Sessions.php"); 
+require_once("./Includes/Sessions.php");
+
+$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+Confirm_Login();
 ?>
 
 <?php 
 if(isset($_POST["Submit"])){
-  print "<pre>";
-print_r($_POST);
-print_r($_FILES);
-print "</pre>";
+//   print "<pre>";
+// print_r($_POST);
+// print_r($_FILES);
+// print "</pre>";
 
   $PostTitle = $_POST["PostTitle"];
   $Category = $_POST["Category"];
   $Image = $_FILES["Image"]["name"];
   $Target = "Upload/".basename($_FILES["Image"]["name"]); //puts submitted image into upload folder
   $PostDescription = $_POST["PostDescription"];
-  $Admin = "Eric";
+  $Admin = $_SESSION["UserName"];
   
   date_default_timezone_set('America/New_York');
   $CurrentTime=time();

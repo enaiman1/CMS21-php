@@ -1,6 +1,11 @@
-<?php require_once("./Includes/DB.php"); ?>
-<?php require_once("./Includes/Functions.php"); ?> 
-<?php require_once("./Includes/Sessions.php"); ?>
+<?php 
+require_once("./Includes/DB.php");  
+require_once("./Includes/Functions.php"); 
+require_once("./Includes/Sessions.php"); 
+
+$_SESSION["TrackingURL"]=$_SERVER["PHP_SELF"];
+Confirm_Login();
+?>
 
 
 <!DOCTYPE html>
