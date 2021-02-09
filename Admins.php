@@ -26,6 +26,9 @@ if ( isset( $_POST['Submit'] ) ) {
     } elseif ($Password !== $ConfirmPassword) {
         $_SESSION['ErrorMessage'] = 'Password and confirm password should match';
         Redirect_to( 'Admins.php' );
+    }  elseif (CheckUserNameExistsOrNot($UserName)) {
+        $_SESSION['ErrorMessage'] = 'Username Exists. Try Another One! ';
+        Redirect_to( 'Admins.php' );
     } else {
         //query to insert new admin into DB
         $sql = 'INSERT INTO admins(datetime, username, password, aname, addedby)';
