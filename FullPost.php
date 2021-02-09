@@ -1,8 +1,57 @@
-<?php require_once( './Includes/DB.php' );
+<?php 
+
+require_once( './Includes/DB.php' );
+ require_once( './Includes/Functions.php' );
+ require_once( './Includes/Sessions.php' );
+  
 ?>
-<?php require_once( './Includes/Functions.php' );
+
+<?php 
+$SearchQueryParameter = $_GET['id'];
 ?>
-<?php require_once( './Includes/Sessions.php' );
+
+<?php 
+if(isset($_POST["Submit"])){
+    $Name    = $_POST["CommenterName"];
+    $Email   = $_POST["CommenterEmail"];
+    $Comment = $_POST["CommenterThoughts"];
+
+    date_default_timezone_set('America/New_York');
+    $CurrentTime=time();
+    $DateTime=strftime("%B-%d-%Y %H:%M:%S" , $CurrentTime);
+  
+  
+    if(empty($Name)||empty($Email)||empty($Comment)){
+        $_SESSION["ErrorMessage"]= "All fields must be filled out";
+        Redirect_to("FullPost.php?id={$SearchQueryParameter}");
+    } elseif(strlen($Comment) > 500){
+        $_SESSION["ErrorMessage"]= "Comment length should be less than 500 characters";
+        Redirect_to("FullPost.php?id={$SearchQueryParameter}");
+    }else {
+      //query to insert comment into DB
+      $ConnectingDB;
+      $sql = "INSERT INTO comments(datetime, name, email, comment, approvedby, status, post_id )";
+      $sql .= "VALUES(:dateTime,:name,:email,:comment, 'Pending', 'OFF', :post_idFromUrl)";
+      $stmt = $ConnectingDB->prepare($sql);
+      $stmt->bindValue(':dateTime',$DateTime);
+      $stmt->bindValue(':name',$Name);
+      $stmt->bindValue(':email',$Email);
+      $stmt->bindValue(':comment',$Comment);
+      $stmt->bindValue(':post_idFromUrl',$SearchQueryParameter);
+      $Execute=$stmt->execute();
+    
+      if($Execute){
+        $_SESSION["SuccessMessage"]="Comment Submitted Successfully";
+        Redirect_to("FullPost.php?id=$SearchQueryParameter");
+      }else {
+        $_SESSION["ErrorMessage"]="Something went wrong. Try Again !";
+        Redirect_to("FullPost.php?id=$SearchQueryParameter");
+      }
+    }
+    } 
+  
+
+
 ?>
 
 <!DOCTYPE html>
@@ -71,6 +120,10 @@ crossorigin = 'anonymous'
 <div class = 'col-sm-8'>
 <h1>The Complete Responsive CMS Blog</h1>
 <h1 class = 'lead'>The Complete Blog by using PHP by Eric</h1>
+<?php 
+        echo ErrorMessage();
+        echo SuccessMessage();
+        ?>
 
 <?php
 $ConnectingDB;
@@ -124,13 +177,85 @@ while ( $DataRows = $stmt->fetch() ) {
     </p>
     </div>
     </div>
-    <?php  }
+    <?php  } ?>
+
+
+    <!-- comment section starts-->
+    <!-- fetching existing comment Start -->
+    <br>
+    <span class="FieldInfo">Comments</span>
+    <br>
+    <br>
+    <?php  
+    
+    $ConnectingDB;
+    $sql = "SELECT * FROM comments 
+    WHERE post_id='$SearchQueryParameter' AND status='ON'";
+    $stmt = $ConnectingDB->query($sql);
+    while ($DataRows = $stmt->fetch()){
+        $CommentDate = $DataRows['datetime'];
+        $CommenterName = $DataRows['name'];
+        $CommentContent = $DataRows['comment'];
+    
     ?>
+    <div>
+        
+        <div class="media CommentBlock">
+            <img class="d-block img-fluid float-start" width="100px" src="./Images/comment.png" alt="">
+            <div class="media-body ml-2">
+                <h6 class="lead"><?php echo $CommenterName; ?></h6>
+                <p class="small"><?php echo $CommentDate; ?></p>
+                <p><?php echo $CommentContent; ?></p>
+            </div>
+        </div>
+    </div><!-- fetching existing comment END -->
+       <hr> 
+<?php } ?>
+    
+    <div class="">
+        <form action="FullPost.php?id=<?php echo $SearchQueryParameter; ?>" method="post">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="FieldInfo">Share your Thoughts about this post</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                            </div>
+                            <input class="form-control" type="text" name="CommenterName" placeholder="Name" value="">
+                        </div>
+                        
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                            </div>
+                            <input class="form-control" type="email" name="CommenterEmail" placeholder="Email" value="">
+                        </div>
+                        
+                    </div>
+                    <div class="form-group">
+                        <textarea  class="form-control" name="CommenterThoughts" id="" cols="80" rows="6"></textarea>
+                    </div>
+                    <div class="mt-2">
+                        <button class="btn btn-primary" name="Submit" type="submit">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div> <!--ending Comment section-->
 
-    </div>
-    <!--ending main content-->
+    </div>  <!--ending main content-->
+  
 
-    <!--ending side area-->
+    <!--begin side area-->
     <div class = 'col-sm-4' style = 'min-height:40px; background:green;'>
 
     </div>
