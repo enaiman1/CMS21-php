@@ -151,7 +151,46 @@ $DateTime=strftime("%B-%d-%Y %H:%M:%S" , $CurrentTime);
                         </div>
                     </div>
                 </div>
-            </form>
+            </form> <!---end form -->
+
+            <h2>Existing Categories</h2>
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>No. </th>
+                        <th>Date&Time</th>
+                        <th>Category Name</th>
+                        <th>Creator Name</th>
+                        <th>Action</th>
+                        
+                    </tr>
+                </thead>
+
+                <?php 
+                    $ConnectingDB;
+                    $sql = "SELECT * FROM category ORDER BY id desc";
+                    $Execute = $ConnectingDB->query($sql);
+                    $SrNo = 0;
+                    while ($DataRows= $Execute->fetch()){
+                        $CategoryId = $DataRows["id"];
+                        $CategoryDate = $DataRows["datetime"];
+                        $CategoryName = $DataRows["title"];
+                        $CreatorName = $DataRows["author"];
+                        $SrNo++;
+                    
+                ?>
+                <tbody>
+                    <tr>
+                        <td><?php echo htmlentities($SrNo); ?></td>
+                        <td><?php echo htmlentities($CategoryDate); ?></td>
+                        <td><?php echo htmlentities($CategoryName); ?></td>
+                        <td><?php echo htmlentities($CreatorName); ?></td>
+                        <td style="min-width:140px;"><a class="btn btn-danger" href="DeleteCategory.php?id=<?php echo $CategoryId;?>"> Delete </a></td>
+                    </tr>
+
+                </tbody>
+                <?php } ?>
+            </table>
         </div>
     </div>
 
