@@ -171,11 +171,11 @@ crossorigin = 'anonymous'
                 </thead>
                 <?php 
                 $ConnectingDB;
-                $sql = "SELECT * FROM posts ORDER BY id desc LIMIT 0, 5";
+                $sql = "SELECT * FROM posts ORDER BY id desc LIMIT 0, 6";
                 $stmt = $ConnectingDB->query($sql);
                 $SrNo= 0;
                 while($DataRows=$stmt->fetch()){
-                    $PostId = $DateRows["id"];
+                    $PostId = $DataRows["id"];
                     $DateTime = $DataRows["datetime"];
                     $Author = $DataRows["author"];
                     $Title = $DataRows["title"];
@@ -189,11 +189,24 @@ crossorigin = 'anonymous'
                         <td><?php echo $DateTime;?></td>
                         <td><?php echo $Author;?></td>
                         <td>
-                            <span class="badge bg-success">00</span>
-                            <span class="badge bg-danger">00</span>
-                        </td>
+                                <?php $Total = ApproveCommentsAccordingtoPost($PostId);
+                                if ($Total>0) {
+                                ?>
+                                <span class="badge bg-success">
+                                    <?php
+                                echo $Total; ?>
+                                </span>
+                                    <?php  }   ?>
+                            <?php $Total = DisApproveCommentsAccordingtoPost($PostId);
+                            if ($Total>0) {  ?>
+                                <span class="badge bg-danger">
+                                <?php
+                                echo $Total; ?>
+                                </span>
+                                    <?php  }  ?>
+                       </td>
                         <td>
-                            <span class="btn btn-info">Preview</span>
+                            <a href="FullPost.php?id=<?php echo $PostId; ?>" target="_blank"><span class="btn btn-info">Preview</span> </a>
                         </td>
                     </tr>
                 </tbody>

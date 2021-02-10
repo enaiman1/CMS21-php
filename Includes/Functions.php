@@ -87,4 +87,22 @@ function TotalComments(){
                         
 }
 
+function ApproveCommentsAccordingtoPost($PostId){
+    global $ConnectingDB;
+    $sqlApprove = "SELECT COUNT(*) FROM comments WHERE post_id='$PostId' AND status='ON'";
+    $stmtApprove =$ConnectingDB->query($sqlApprove);
+    $RowsTotal = $stmtApprove->fetch();
+    $Total = array_shift($RowsTotal);
+    return $Total;
+  }
+  
+  function DisApproveCommentsAccordingtoPost($PostId){
+    global $ConnectingDB;
+    $sqlDisApprove = "SELECT COUNT(*) FROM comments WHERE post_id='$PostId' AND status='OFF'";
+    $stmtDisApprove =$ConnectingDB->query($sqlDisApprove);
+    $RowsTotal = $stmtDisApprove->fetch();
+    $Total = array_shift($RowsTotal);
+    return $Total;
+  }
+
 ?>
