@@ -254,11 +254,97 @@ while ( $DataRows = $stmt->fetch() ) {
     </div>  <!--ending main content-->
   
 
-    <!--begin side area-->
-    <div class = 'col-sm-4' style = 'min-height:40px; background:green;'>
+   <!--side area start-->
+   <div class="col-sm-4">
+            <div class="card mt-4">
+                <div class="card-body">
+                  <img src="./Images/startblog.PNG" class="d-block img-fluid mb-3" alt="">
+                  <div class="text-center">
+                       Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem, numquam quae? Aut consequatur asperiores molestias! Numquam cumque esse vel animi, eos optio ea iste facere! At laboriosam voluptas a beatae? 
+                  </div>
+                </div>
+            </div>
+            <br>
+            <div class="card">
+            <div class="card">
+                    <div class="card-header bg-dark text-light">
+                          <h2 class="lead text-center">Sign Up!</h2>
+                    </div>
+                </div>
+                <div class="card-body d-grid">
+                     <button class="btn btn-success text-center text-white mb-4" name="button">
+                      Join the Forum
+                     </button>
+                     <button class="btn btn-danger text-center text-white mb-4" name="button">
+                      Login
+                     </button>
+                     <div class="input-group">
+                        <div class="input-group-text bg-info" id="btnGroupAddon2">Subscribe now</div>
+                        <input type="text" class="form-control" placeholder="Enter your emai" aria-label="Input group example" aria-describedby="btnGroupAddon2">
+                    </div>
+                </div>
+            </div>
+            <br> 
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-light">
+                  <h2 class="lead">Categories</h2>
+                </div>
+                <div class="card-body">
+                        <?php 
+                        
+                        $sql = "SELECT * FROM category ORDER BY id desc";
+                        $stmt = $ConnectingDB->query($sql);
+                        while($DataRows = $stmt->fetch()){
+                          $CategoryId= $DataRows['id'];
+                          $CategoryName= $DataRows['title'];
+                        ?>
+                          <a href="Blog.php?category=<?php echo $Category; ?>">
+                            <span class="heading"><?php echo $CategoryName; ?></span><br>
+                          </a>
 
-    </div>
-    <!--ending side area-->
+                        <?php } ?>
+                </div>
+            </div>
+
+            <br>
+
+             <div class="card">
+                <div class="card-header bg-info text-white">
+                      <h2 class="lead text-center">Recent Posts</h2>    
+                </div>
+                <div class="card-body">
+                    <?php 
+                      $ConnectingDB;
+                      $sql= "SELECT * FROM posts ORDER BY id desc Limit 0,5";
+                      $stmt = $ConnectingDB->query($sql);
+                      while($DataRows=$stmt->fetch()){
+                        $Id = $DataRows['id'];
+                        $Title = $DataRows['title'];
+                        $DateTime = $DataRows['datetime'];
+                        $Image = $DataRows['image'];
+                    ?>
+
+                   <div class="media">
+                        <img src="./Upload/<?php echo htmlentities($Image); ?>" width="90px" height="94px" alt="" class="d-block image-fluid align-self-start">
+                        <div class="media-body ml-2">
+                            <a href="FullPost.php?id=<?php echo htmlentities($Id); ?>" target="_blank">
+                              <h6 class="lead"><?php echo htmlentities($Title); ?></h6>
+                            </a>
+                              <p class="small"><?php echo htmlentities($DateTime); ?></p>
+                        </div>
+                   </div>
+                   <hr>
+                   
+                   <?php } ?>
+                </div>
+             </div>
+
+        </div>
+        
+        <br>
+        
+      
+    </div><!--side area ends-->
     </div>
     </div>
 
