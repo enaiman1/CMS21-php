@@ -171,6 +171,51 @@ echo SuccessMessage();
 </div>
 </div>
 </form>
+
+<!-- Exist Admin table starts -->
+
+<h2>Existing Admins</h2>
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>No. </th>
+                        <th>Date&Time</th>
+                        <th>Username</th>
+                        <th>Admin Name</th>
+                        <th>Added by</th>
+                        <th>Action</th>
+                        
+                    </tr>
+                </thead>
+
+                <?php 
+                    $ConnectingDB;
+                    $sql = "SELECT * FROM admins ORDER BY id desc";
+                    $Execute = $ConnectingDB->query($sql);
+                    $SrNo = 0;
+                    while ($DataRows= $Execute->fetch()){
+                        $AdminId = $DataRows["id"];
+                        $DateTime = $DataRows["datetime"];
+                        $AdminUsername = $DataRows["username"];
+                        $AdminName = $DataRows["aname"];
+                        $AddedBy = $DataRows["addedby"];
+                        $SrNo++;
+                    
+                ?>
+                <tbody>
+                    <tr>
+                        <td><?php echo htmlentities($SrNo); ?></td>
+                        <td><?php echo htmlentities($DateTime); ?></td>
+                        <td><?php echo htmlentities($AdminUsername); ?></td>
+                        <td><?php echo htmlentities($AdminName); ?></td>
+                        <td><?php echo htmlentities($AddedBy); ?></td>
+                        <td style="min-width:140px;"><a class="btn btn-danger" href="DeleteAdmin.php?id=<?php echo $AdminId;?>"> Delete </a></td>
+                    </tr>
+
+                </tbody>
+                <?php } ?>
+            </table>
+<!-- Exist Admin table ends -->
 </div>
 </div>
 
