@@ -98,7 +98,7 @@
                 $DateTime = $DataRows['datetime'];
                 $PostTitle = $DataRows['title'];
                 $Category = $DataRows['category'];
-                $admin = $DataRows["author"];
+                $Admin = $DataRows["author"];
                 $Image = $DataRows['image'];
                 $PostDecription = $DataRows['post'];
              
@@ -108,8 +108,10 @@
               <div class="card-body">
               
                 <h4 class="card-title"><?php echo htmlentities($PostTitle); ?></h4>
-                <small class="text-muted">Written by <?php echo $Admin ?> On <?php echo htmlentities($DateTime); ?></small>
-                <span style="float:right;" class="badge bg-dark text-light" >Comments 20</span>
+                <small class="text-muted"> Category: <span class="text-dark"><?php echo htmlentities($Category); ?> </span> & Written by <?php echo htmlentities($Admin) ?> On <?php echo htmlentities($DateTime); ?></small>
+                <span style="float:right;" class="badge bg-dark text-light" >
+                    Comments <?php echo ApproveCommentsAccordingtoPost($PostId);?>
+                </span>
                   <hr>
                 <p class="card-text">
                   <?php 
