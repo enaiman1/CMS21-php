@@ -1,6 +1,9 @@
-<?php require_once("./Includes/DB.php"); ?>
-<?php require_once("./Includes/Functions.php"); ?> 
-<?php require_once("./Includes/Sessions.php"); ?>
+<?php 
+ require_once( './Includes/DB.php' );
+ require_once( './Includes/Functions.php' );
+ require_once( './Includes/Sessions.php' ); 
+ 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -135,7 +138,13 @@
               <div class="card-body">
               
                 <h4 class="card-title"><?php echo htmlentities($PostTitle); ?></h4>
-                <small class="text-muted"> Category: <span class="text-dark"><?php echo htmlentities($Category); ?> </span> & Written by <?php echo htmlentities($Admin) ?> On <?php echo htmlentities($DateTime); ?></small>
+                <small class="text-muted"> Category: 
+                 <span class="text-dark"><?php echo htmlentities($Category); ?> </span> 
+                 & Written by  <a href="Profile.php?username=<?php echo htmlentities($Admin); ?>">
+                <?php echo htmlentities($Admin); ?>
+                </a> 
+                On <?php echo htmlentities($DateTime); ?>
+                </small>
                 <span style="float:right;" class="badge bg-dark text-light" >
                     Comments <?php echo ApproveCommentsAccordingtoPost($PostId);?>
                 </span>
